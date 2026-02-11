@@ -2,5 +2,8 @@
   "name": "claude-stuff",
   "description": "A personal collection of Claude Code hooks and skills — quality-of-life guardrails and workflow automations.",
   "version": "0.1.0",
-  "author": "ian"
+  "author": {
+    "name": "ianhi",
+    "email": "ianhi@users.noreply.github.com"
+  }
 }
