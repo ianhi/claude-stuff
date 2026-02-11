@@ -11,6 +11,18 @@ INPUT=$(cat)
 
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name')
 
+# Only check Python files — skip everything else for speed
+FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // .tool_input.notebook_path // empty')
+case "$FILE_PATH" in
+  *.py|*.ipynb) ;;  # continue
+  *)
+    # MCP tools may not have a recognizable path — check those too
+    if [ -n "$FILE_PATH" ]; then
+      exit 0
+    fi
+    ;;
+esac
+
 # Extract the relevant content based on tool type
 CONTENT=""
 case "$TOOL_NAME" in

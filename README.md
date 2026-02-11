@@ -11,7 +11,8 @@ A personal collection of [Claude Code](https://docs.anthropic.com/en/docs/claude
 ## Installation
 
 ```bash
-claude /plugin install https://github.com/ianhi/claude-stuff
+claude plugin marketplace add ianhi/claude-stuff
+claude plugin install claude-stuff
 ```
 
 ## Development
@@ -22,8 +23,8 @@ claude /plugin install https://github.com/ianhi/claude-stuff
 git clone https://github.com/ianhi/claude-stuff
 cd claude-stuff
 
-# Install as a plugin from local checkout
-claude /plugin install .
+# Load as a plugin from local checkout (session only)
+claude --plugin-dir .
 
 # Install test dependencies
 uv sync

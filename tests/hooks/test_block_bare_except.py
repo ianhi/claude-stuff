@@ -100,3 +100,71 @@ class TestToolTypes:
         stdout, _, exit_code = run_hook(HOOK, payload)
         assert stdout.strip() == ""
         assert exit_code == 0
+
+
+class TestFileTypeFiltering:
+    """The hook should only check Python files and skip everything else."""
+
+    BARE_CATCH = "try:\n    x()\nexcept Exception:\n    pass\n"
+
+    def test_skips_javascript_file(self, run_hook):
+        payload = {
+            "tool_name": "Write",
+            "tool_input": {"file_path": "/tmp/app.js", "content": self.BARE_CATCH},
+        }
+        stdout, _, exit_code = run_hook(HOOK, payload)
+        assert stdout.strip() == ""
+        assert exit_code == 0
+
+    def test_skips_typescript_file(self, run_hook):
+        payload = {
+            "tool_name": "Edit",
+            "tool_input": {
+                "file_path": "/tmp/app.ts",
+                "old_string": "x",
+                "new_string": self.BARE_CATCH,
+            },
+        }
+        stdout, _, exit_code = run_hook(HOOK, payload)
+        assert stdout.strip() == ""
+        assert exit_code == 0
+
+    def test_skips_markdown_file(self, run_hook):
+        payload = {
+            "tool_name": "Write",
+            "tool_input": {"file_path": "/tmp/README.md", "content": self.BARE_CATCH},
+        }
+        stdout, _, exit_code = run_hook(HOOK, payload)
+        assert stdout.strip() == ""
+        assert exit_code == 0
+
+    def test_checks_python_file(self, run_hook):
+        payload = {
+            "tool_name": "Write",
+            "tool_input": {"file_path": "/tmp/app.py", "content": self.BARE_CATCH},
+        }
+        stdout, _, exit_code = run_hook(HOOK, payload)
+        result = json.loads(stdout)
+        assert result["hookSpecificOutput"]["permissionDecision"] == "deny"
+
+    def test_checks_notebook_file(self, run_hook):
+        payload = {
+            "tool_name": "NotebookEdit",
+            "tool_input": {
+                "notebook_path": "/tmp/analysis.ipynb",
+                "new_source": self.BARE_CATCH,
+            },
+        }
+        stdout, _, exit_code = run_hook(HOOK, payload)
+        result = json.loads(stdout)
+        assert result["hookSpecificOutput"]["permissionDecision"] == "deny"
+
+    def test_mcp_tool_no_path_still_checked(self, run_hook):
+        """MCP tools without a file path should still be checked."""
+        payload = {
+            "tool_name": "mcp__editor__write",
+            "tool_input": {"content": self.BARE_CATCH},
+        }
+        stdout, _, exit_code = run_hook(HOOK, payload)
+        result = json.loads(stdout)
+        assert result["hookSpecificOutput"]["permissionDecision"] == "deny"

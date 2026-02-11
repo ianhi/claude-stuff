@@ -1,0 +1,12 @@
+{
+  "name": "ianhi-plugins",
+  "description": "Ian's Claude Code plugins",
+  "plugins": [
+    {
+      "name": "claude-stuff",
+      "description": "Hooks and skills for Claude Code — quality-of-life guardrails and workflow automations",
+      "source": "ianhi/claude-stuff",
+      "version": "0.1.0"
+    }
+  ]
+}
