@@ -1,0 +1,11 @@
+[project]
+name = "claude-stuff"
+version = "0.1.0"
+description = "Personal collection of Claude Code hooks and skills"
+requires-python = ">=3.10"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
