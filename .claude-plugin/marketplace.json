@@ -1,12 +1,25 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "ianhi-plugins",
   "description": "Ian's Claude Code plugins",
+  "owner": {
+    "name": "ianhi",
+    "email": "ianhi@users.noreply.github.com"
+  },
   "plugins": [
     {
       "name": "claude-stuff",
       "description": "Hooks and skills for Claude Code — quality-of-life guardrails and workflow automations",
-      "source": "ianhi/claude-stuff",
-      "version": "0.1.0"
+      "version": "0.1.0",
+      "author": {
+        "name": "ianhi",
+        "email": "ianhi@users.noreply.github.com"
+      },
+      "source": {
+        "source": "url",
+        "url": "https://github.com/ianhi/claude-stuff.git"
+      },
+      "category": "productivity"
     }
   ]
 }
