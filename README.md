@@ -10,37 +10,24 @@ A personal collection of [Claude Code](https://docs.anthropic.com/en/docs/claude
 
 ## Installation
 
-### As a Claude Code plugin
-
 ```bash
-claude /plugin install /path/to/claude-stuff
-# or from a git URL:
-claude /plugin install https://github.com/youruser/claude-stuff
-```
-
-### Manual
-
-Copy individual hook scripts and wire them up in your `.claude/settings.json`:
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Write|Edit|NotebookEdit|mcp__.*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/path/to/hooks/scripts/block-bare-except.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
+claude /plugin install https://github.com/ianhi/claude-stuff
 ```
 
 ## Development
+
+### Setup
+
+```bash
+git clone https://github.com/ianhi/claude-stuff
+cd claude-stuff
+
+# Install as a plugin from local checkout
+claude /plugin install .
+
+# Install test dependencies
+uv sync
+```
 
 ### Prerequisites
 
