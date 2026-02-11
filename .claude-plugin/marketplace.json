@@ -4,7 +4,7 @@
   "description": "Ian's Claude Code plugins",
   "owner": {
     "name": "ianhi",
-    "email": "ianhi@users.noreply.github.com"
+    "email": "ianhuntisaak@gmail.com"
   },
   "plugins": [
     {
@@ -13,7 +13,7 @@
       "version": "0.1.0",
       "author": {
         "name": "ianhi",
-        "email": "ianhi@users.noreply.github.com"
+        "email": "ianhuntisaak@gmail.com"
       },
       "source": {
         "source": "url",
