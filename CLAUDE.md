@@ -8,9 +8,12 @@ A Claude Code plugin repo containing hooks and skills. Structured as a distribut
 
 - `hooks/scripts/` — Hook shell scripts
 - `hooks/hooks.json` — Hook event → script mappings (plugin format, uses `${CLAUDE_PLUGIN_ROOT}`)
-- `skills/` — Skill definitions (future)
+- `skills/` — Skill definitions (one directory per skill, each with a `SKILL.md`)
+- `commands/` — Slash command definitions (one `.md` per command)
 - `tests/` — pytest tests for hooks and skills
 - `.claude-plugin/plugin.json` — Plugin manifest for distribution
+
+The author's live `~/.claude/skills/` and `~/.claude/commands/` entries are **symlinks into this repo**, so this repo is the single source of truth: edits here are live locally, `git push` shares them, `git pull` syncs them to another machine.
 
 ## Running Tests
 

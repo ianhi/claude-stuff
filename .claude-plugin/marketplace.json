@@ -9,8 +9,8 @@
   "plugins": [
     {
       "name": "claude-stuff",
-      "description": "Hooks and skills for Claude Code — quality-of-life guardrails and workflow automations",
-      "version": "0.1.0",
+      "description": "Skills, commands, and hooks for Claude Code — quality-of-life guardrails and workflow automations",
+      "version": "0.2.0",
       "author": {
         "name": "ianhi",
         "email": "ianhuntisaak@gmail.com"
