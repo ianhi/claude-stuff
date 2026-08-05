@@ -8,7 +8,6 @@ A personal collection of [Claude Code](https://docs.anthropic.com/en/docs/claude
 |-------|-------------|
 | `agent-handoff` | Prepare a handoff so a fresh session can continue the current work |
 | `coiled-notebook` | Launch a [Coiled](https://coiled.io) cloud Jupyter notebook and connect via the Jupyter MCP |
-| `doc-writing` | Write technical documentation with strong narrative structure and crosslinking |
 | `hypothesis-failure-investigation` | Triage and diagnose [Hypothesis](https://hypothesis.readthedocs.io) stateful test failures |
 | `plot-check` | Dispatch a subagent to review a plot image for visual issues and suggest fixes |
 
