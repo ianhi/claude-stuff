@@ -1,7 +1,7 @@
 ---
 name: icechunk-release-prep
 description: Prepare an icechunk release (version bumps, changelog, commit)
-argument-hint: "[version, e.g. 1.1.21]"
+argument-hint: "[version, e.g. 2.3.1]"
 allowed-tools: Read, Glob, Grep, Write, Edit, Bash(git *), Bash(cargo *), Bash(gh *), Bash(just *)
 ---
 
@@ -9,25 +9,24 @@ allowed-tools: Read, Glob, Grep, Write, Edit, Bash(git *), Bash(cargo *), Bash(g
 
 Prepare the icechunk release for version $ARGUMENTS.
 
+`RELEASE.md` at the repo root is the source of truth for which files to bump and how to publish. Read it first and follow it. This command adds the branch, changelog and PR conventions that `RELEASE.md` leaves out.
+
 ## Context
 
 Current date: !`date "+%b %d, %Y"`
 Current branch: !`git rev-parse --abbrev-ref HEAD`
 Last release tag: !`git describe --tags --abbrev=0`
-Current Rust icechunk version: !`grep '^version' icechunk/Cargo.toml | head -1`
 Current Python icechunk version: !`grep '^version' icechunk-python/Cargo.toml | head -1`
 
 ## Step 0: Determine version
 
-If `$ARGUMENTS` is empty or missing, ask the user what version to release before proceeding. Suggest the next patch version based on the current Python icechunk version above (e.g. if current is 1.1.20, suggest 1.1.21). Do NOT proceed until you have a confirmed version number. Use VERSION to refer to the confirmed version in subsequent steps.
+If `$ARGUMENTS` is empty or missing, ask the user what version to release before proceeding. Suggest the next patch version based on the current Python icechunk version above (e.g. if current is 2.3.0, suggest 2.3.1). Do NOT proceed until you have a confirmed version number. Use VERSION to refer to the confirmed version in subsequent steps.
 
 If `$ARGUMENTS` is provided, set VERSION = `$ARGUMENTS`.
 
 ## Tasks
 
-1. **Create a release branch**:
-   - Create a new branch off the current branch: `git checkout -b release/vVERSION`
-   - This prevents accidental direct commits to the release/support branch
+1. **Create a release branch** off the current branch: `git checkout -b release/vVERSION --no-track`. This keeps release commits off `main` and support branches.
 
 2. **Identify changes since the last release**:
    - Run `gh pr list --state merged --base main --limit 100 --json number,title,author,labels --search "merged:>YYYY-MM-DD"` (use the date of the last release tag)
@@ -35,46 +34,26 @@ If `$ARGUMENTS` is provided, set VERSION = `$ARGUMENTS`.
    - Categorize PRs into: Features, Fixes, Breaking Changes, Performance
    - Skip automation-only PRs (dependabot, CI-only changes) unless they affect users
 
-3. **Update version numbers**:
-   - Update `icechunk-python/Cargo.toml` version to VERSION
-   - If there are Rust library changes, update `icechunk/Cargo.toml` version too
-   - If the Rust version was bumped, update the `icechunk` dependency version in `icechunk-python/Cargo.toml`
-   - Run `cargo check` to update `Cargo.lock`
+3. **Bump versions** as described under "Update version metadata files" in `RELEASE.md`. Every workspace crate and `icechunk-js/package.json` move to VERSION in lockstep, along with the internal pins under `[workspace.dependencies]`. Run `cargo check` to update `Cargo.lock`.
 
-4. **Update the changelog** in `Changelog.python.md`:
-   - Add a new section at the top, below the `# Changelog` header
+4. **Update the changelog** in `Changelog.python.md` (`Changelog.md` is a symlink to it):
+   - If there is a `## Python Icechunk Library [unreleased]` section, rename it to `## Python Icechunk Library VERSION` and fill in anything missing. Otherwise add a new section below the `# Changelog` header.
    - Follow the existing format exactly (see Format Reference below)
-   - Include entries for all non-trivial merged PRs with links
-   - Each entry should be a single line with a PR link in the format `([#NNN](https://github.com/earth-mover/icechunk/pull/NNN))`
-   - Remove empty sections (don't include Features if there are none, etc.)
+   - Include entries for all non-trivial merged PRs, each a single line ending with a link like `([#NNN](https://github.com/earth-mover/icechunk/pull/NNN))`
+   - Remove empty sections
 
-5. **Run tests** to verify everything works:
-   - Run `just pre-commit-ci` or at minimum `cargo check` to ensure the workspace compiles
+5. **Verify** with `just pre-commit-ci`, or at minimum `cargo check`.
 
-6. **Commit the changes** with message:
-
-   ```
-   Release vVERSION
-
-   Co-authored-by: Claude <noreply@anthropic.com>
-   ```
-
-   Stage only the relevant files:
-   - `icechunk/Cargo.toml` (if changed)
-   - `icechunk-python/Cargo.toml`
-   - `Cargo.lock`
-   - `Changelog.python.md`
+6. **Commit** with the message `Release vVERSION`. Stage only the files the version bump and changelog touched (check `git status`); the bump also regenerates `icechunk-js/index.js`.
 
 7. **Push and create a draft PR**:
    - Push the release branch: `git push -u origin release/vVERSION`
-   - Target the base release branch (e.g. `support/v1.x` if on a support branch, or `main`)
+   - Target the base release branch (`main`, or e.g. `support/v1.x` for a support release)
    - Title: `Release vVERSION`
    - Request the logged-in GitHub user as reviewer (`gh api user --jq '.login'`)
    - Include the changelog entries in the PR body
 
 ## Changelog Format Reference
-
-The changelog entry should look like:
 
 ```markdown
 ## Python Icechunk Library VERSION
@@ -98,20 +77,12 @@ The changelog entry should look like:
 
 ## Post-merge: Publishing checklist
 
-After the release PR merges, remind the user of these manual steps:
+After the release PR merges, walk the user through the publishing sections of `RELEASE.md`, in this order:
 
-1. **Publish Rust library** (if `icechunk/Cargo.toml` version was bumped):
-   - Go to GitHub Actions → `publish rust library` workflow → Run workflow (manual dispatch)
-2. **Publish Python wheels to PyPI**:
-   - Go to GitHub Actions → `Python CI and library release` workflow → Run workflow with `pypi_release=true`
-3. **Create GitHub Release**:
-   - Go to Releases → Draft a new release
-   - Let GitHub create the tag (`vVERSION`)
-   - Use "Generate release notes" for the body
-   - This triggers the community Slack notification
+1. Rust crates: the `publish rust library` workflow.
+2. Python wheels: the `Python CI and library release` workflow with `Make a PyPI release` checked.
+3. JS package: the `JS CI` workflow. Every manual run publishes to npm.
+4. GitHub release: let GitHub create the `vVERSION` tag and generate the notes. This notifies the community Slack.
+5. conda-forge: merge the automated feedstock PR when it appears.
 
-## Important Notes
-
-- The Python version (`icechunk-python/Cargo.toml`) and Rust version (`icechunk/Cargo.toml`) are independent — the Python version can be ahead of the Rust version
-- `Changelog.md` is a symlink to `Changelog.python.md` — edit `Changelog.python.md` directly
-- Allowed release branches: `main`, `release-*`, `support/v*`
+Each step publishes, so the user starts them; don't dispatch workflows yourself.
