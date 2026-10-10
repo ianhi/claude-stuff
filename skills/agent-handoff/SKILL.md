@@ -137,11 +137,13 @@ diff and git log. Only include session history if something was tried and failed
 - Open questions and uncertainties
 - What was tried and didn't work (dead ends to avoid)
 - Key decisions made and rationale (only if non-obvious from the code)
-- A suggested opening prompt for the next session
+
+Don't put an opening prompt in the doc: the prompt is what starts the next
+session and points it at the doc, so inside the doc it is redundant.
 
 **After writing:**
 - Commit the handoff doc separately from code changes
-- Tell the user the opening prompt for the next session, e.g.:
+- Tell the user the opening prompt for the next session in chat, e.g.:
   "please read notes/handoff.md to understand where we are at. then [next task]"
 
 ### Variant C: Context Files Kit
